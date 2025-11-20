@@ -30,19 +30,31 @@
 #endif
 
 #define USES_DIAG_JUMPERS
+#define DIAG_JUMPERS_REMOVED
 
 // Ignore temp readings during development.
 //#define BOGUS_TEMPERATURE_GRACE_PERIOD    2000
 
-// Onboard I2C EEPROM
-#if ANY(NO_EEPROM_SELECTED, I2C_EEPROM)
-  #undef NO_EEPROM_SELECTED
-  #define I2C_EEPROM
-  #define SOFT_I2C_EEPROM                         // Force the use of Software I2C
-  #define I2C_SCL_PIN                       PB6
-  #define I2C_SDA_PIN                       PB7
-  #define MARLIN_EEPROM_SIZE             0x1000U  // 4K
+#define FLASH_EEPROM_EMULATION
+//#define SDCARD_EEPROM_EMULATION
+
+#if ANY(NO_EEPROM_SELECTED, FLASH_EEPROM_EMULATION)
+  #define FLASH_EEPROM_EMULATION
+  #define EEPROM_PAGE_SIZE     (0x800U)           // 2K
+  #define EEPROM_START_ADDRESS (0x8000000UL + (STM32_FLASH_SIZE) * 1024UL - (EEPROM_PAGE_SIZE) * 2UL)
+  #define MARLIN_EEPROM_SIZE    EEPROM_PAGE_SIZE  // 2K
 #endif
+
+// Onboard I2C EEPROM
+// disabled because my eeprom failed
+//#if EITHER(NO_EEPROM_SELECTED, I2C_EEPROM)
+//  #undef NO_EEPROM_SELECTED
+//  #define I2C_EEPROM
+//  #define SOFT_I2C_EEPROM                         // Force the use of Software I2C
+//  #define I2C_SCL_PIN                       PB6
+//  #define I2C_SDA_PIN                       PB7
+//  #define MARLIN_EEPROM_SIZE              0x1000  // 4K
+//#endif
 
 #define BOARD_LCD_SERIAL_PORT 1
 
@@ -51,7 +63,7 @@
 //
 // Servos
 //
-#define SERVO0_PIN                          PA1   // SERVOS
+#define SERVO0_PIN                          PD5   // SERVOS
 
 //
 // Limit Switches
@@ -83,11 +95,12 @@
 // Power-loss Detection
 //
 #ifndef POWER_LOSS_PIN
-  #define POWER_LOSS_PIN                    PC12  // Power Loss Detection: PWR-DET
+  //#define POWER_LOSS_PIN                    PC12  //PC12 Power Loss Detection: PWR-DET
+  // setting anything else to PC12 makes homing get stuck on "processing"? I just spent 4 hours figuring that out.
 #endif
 
 #ifndef PS_ON_PIN
-  #define PS_ON_PIN                         PC13  // Power Supply Control
+  //#define PS_ON_PIN                         PC13  // Power Supply Control
 #endif
 
 //
@@ -138,6 +151,14 @@
   static_assert(E0_SLAVE_ADDRESS == 3, "E0_SLAVE_ADDRESS must be 3 for BOARD_BTT_SKR_MINI_E3_V3_0.");
 #endif
 
+#if HAS_CUTTER
+  #ifndef SPINDLE_LASER_PWM_PIN
+    #define SPINDLE_LASER_PWM_PIN           PC2
+  #endif
+  #ifndef SPINDLE_LASER_ENA_PIN
+    #define SPINDLE_LASER_ENA_PIN           PC13
+  #endif
+#endif // SPINDLE_FEATURE || LASER_FEATURE
 //
 // Temperature Sensors
 //
@@ -150,8 +171,9 @@
 #define HEATER_0_PIN                        PC8   // "HE"
 #define HEATER_BED_PIN                      PC9   // "HB"
 #define FAN0_PIN                            PC6   // "FAN0"
-#define FAN1_PIN                            PC7   // "FAN1"
-#define FAN2_PIN                            PB15  // "FAN2"
+#define FAN1_PIN                            PB15   // "FAN1"
+#define FAN2_PIN                            PA8  // "FAN2"
+//#define FAN3_PIN                            PD4  // "FAN3"
 
 /**
  *              SKR Mini E3 V3.0
@@ -270,12 +292,21 @@
 
       CONTROLLER_WARNING("BTT_SKR_MINI_E3_V3_0", "ZONESTAR_LCD")
 
-      #define LCD_PINS_RS            EXP1_06_PIN
+      /*#define LCD_PINS_RS            EXP1_06_PIN
       #define LCD_PINS_EN            EXP1_02_PIN
       #define LCD_PINS_D4            EXP1_07_PIN
       #define LCD_PINS_D5            EXP1_05_PIN
       #define LCD_PINS_D6            EXP1_03_PIN
-      #define LCD_PINS_D7            EXP1_01_PIN
+      #define LCD_PINS_D7            EXP1_01_PIN*/
+	  #define LCD_PINS_RS            PB9
+      #define LCD_PINS_EN        PD6
+      #define LCD_PINS_D4            PB8
+      #define LCD_PINS_D5            PA10
+      #define LCD_PINS_D6            PA9
+      #define LCD_PINS_D7            PB5
+      #define ADC_KEYPAD_PIN                PA1   //(PA2) Repurpose servo pin for ADC - CONNECTING TO 5V WILL DAMAGE THE BOARD!
+      
+      #define BEEPER_PIN                    PD0
       #define ADC_KEYPAD_PIN                PA1   // Repurpose servo pin for ADC - CONNECTING TO 5V WILL DAMAGE THE BOARD!
 
     #elif ANY(MKS_MINI_12864, ENDER2_STOCKDISPLAY)
@@ -454,7 +485,7 @@
 // NeoPixel
 //
 #ifndef BOARD_NEOPIXEL_PIN
-  #define BOARD_NEOPIXEL_PIN                PA8   // LED driving pin
+  //#define BOARD_NEOPIXEL_PIN                PA8   // LED driving pin
 #endif
 
 // Pins for documentation and sanity checks only.
