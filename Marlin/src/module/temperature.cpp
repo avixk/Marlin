@@ -486,7 +486,7 @@ PGMSTR(str_t_heating_failed, STR_T_HEATING_FAILED);
       }
     #endif
 
-    TERN_(SINGLENOZZLE, if (fan < EXTRUDERS) fan = 0); // Always fan 0 for SINGLENOZZLE E fan
+    //TERN_(SINGLENOZZLE, if (fan < EXTRUDERS) fan = 0); // Always fan 0 for SINGLENOZZLE E fan
 
     if (fan >= FAN_COUNT) return;
 

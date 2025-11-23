@@ -501,6 +501,8 @@ inline void beep_bad_cmd() { BUZZ(400, 40); }
       stepper.disable_extruder();
       ui.status_printf(0, GET_TEXT_F(MSG_MMU2_LOADING_FILAMENT), int(index + 1));
 
+      unload();
+
       command(MMU_CMD_T0 + index);
       manage_response(true, true);
 
@@ -888,7 +890,8 @@ void MMU2::filament_runout() {
       // Slowly spin the extruder during C0
       else {
         while (planner.movesplanned() < 3)
-          unscaled_mmu2_e_move(0.25, MMM_TO_MMS(120), false);
+          //unscaled_mmu2_e_move(0.25, MMM_TO_MMS(120), false);
+          unscaled_mmu2_e_move(0.25, MMM_TO_MMS(480), false);
       }
     }
     mmu2s_triggered = present;
@@ -897,13 +900,14 @@ void MMU2::filament_runout() {
   bool MMU2::can_load() {
     static constexpr E_Step can_load_sequence[] PROGMEM = { MMU2_CAN_LOAD_SEQUENCE },
                   can_load_increment_sequence[] PROGMEM = { MMU2_CAN_LOAD_INCREMENT_SEQUENCE };
-
+    DEBUG_ECHOLNPGM("MMU - extruder executing sequence: can load");
     execute_extruder_sequence(can_load_sequence, COUNT(can_load_sequence));
 
     int filament_detected_count = 0;
     const int steps = (MMU2_CAN_LOAD_RETRACT) / (MMU2_CAN_LOAD_INCREMENT);
     DEBUG_ECHOLNPGM("MMU can_load:");
     for (uint8_t i = 0; i < steps; ++i) {
+      DEBUG_ECHOLNPGM("MMU - extruder executing sequence: can load increment");
       execute_extruder_sequence(can_load_increment_sequence, COUNT(can_load_increment_sequence));
       check_filament(); // Don't trust the idle function
       DEBUG_CHAR(mmu2s_triggered ? 'O' : 'o');
@@ -1037,11 +1041,13 @@ bool MMU2::unload() {
 
 void MMU2::ramming_sequence() {
   static const E_Step sequence[] PROGMEM = { MMU2_RAMMING_SEQUENCE };
+  DEBUG_ECHOLNPGM("MMU - extruder executing sequence: ramming");
   execute_extruder_sequence(sequence, COUNT(sequence));
 }
 
 void MMU2::load_to_nozzle_sequence() {
   static const E_Step sequence[] PROGMEM = { MMU2_LOAD_TO_NOZZLE_SEQUENCE };
+  DEBUG_ECHOLNPGM("MMU - extruder executing sequence: load to nozzle");
   execute_extruder_sequence(sequence, COUNT(sequence));
 }
 

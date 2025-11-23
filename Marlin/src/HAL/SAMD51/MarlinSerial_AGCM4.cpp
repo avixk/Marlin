@@ -54,6 +54,26 @@
   void SERCOM5_1_Handler() { Serial4.IrqHandler(); }
   void SERCOM5_2_Handler() { Serial4.IrqHandler(); }
   void SERCOM5_3_Handler() { Serial4.IrqHandler(); }
+  
+  #warning "Using Serial4"
+#endif
+
+#if USING_HW_SERIAL4
+  UartT Serial5(false, &sercom6, PIN_SERIAL5_RX, PIN_SERIAL5_TX, PAD_SERIAL5_RX, PAD_SERIAL5_TX);
+  void SERCOM6_0_Handler() { Serial5.IrqHandler(); }
+  void SERCOM6_1_Handler() { Serial5.IrqHandler(); }
+  void SERCOM6_2_Handler() { Serial5.IrqHandler(); }
+  void SERCOM6_3_Handler() { Serial5.IrqHandler(); }
+  #warning "Using Serial5"
+#endif
+
+#if USING_HW_SERIAL5
+  UartT Serial5(false, &sercom6, PIN_SERIAL5_RX, PIN_SERIAL5_TX, PAD_SERIAL5_RX, PAD_SERIAL5_TX);
+  void SERCOM6_0_Handler() { Serial5.IrqHandler(); }
+  void SERCOM6_1_Handler() { Serial5.IrqHandler(); }
+  void SERCOM6_2_Handler() { Serial5.IrqHandler(); }
+  void SERCOM6_3_Handler() { Serial5.IrqHandler(); }
+  #warning "Using Serial6"
 #endif
 
 #endif // ADAFRUIT_GRAND_CENTRAL_M4
