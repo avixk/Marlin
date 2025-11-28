@@ -562,7 +562,7 @@ void GcodeSuite::G28() {
     #endif
 
     #ifdef XY_AFTER_HOMING
-      if (!axes_should_home(_BV(X_AXIS) | _BV(Y_AXIS)))
+      if (HAS_Z_AXIS && doZ && !axes_should_home(_BV(X_AXIS) | _BV(Y_AXIS)))
         do_blocking_move_to(xy_pos_t(XY_AFTER_HOMING));
     #endif
 
