@@ -292,7 +292,10 @@ void MMU2::mmu_loop() {
         // This is super annoying. Only activate if necessary
         //if (finda_runout_valid) DEBUG_ECHOLNPGM("MMU <= 'P0'\nMMU => ", p_float_t(finda, 6));
 
-        if (!finda && finda_runout_valid) filament_runout();
+        if (!finda && finda_runout_valid) {
+          DEBUG_ECHOLNPGM("runout 0");
+          filament_runout();
+        }
         if (cmd == MMU_CMD_NONE) ready = true;
         state = 1;
       }
@@ -874,8 +877,11 @@ void MMU2::set_filament_type(const uint8_t index, const uint8_t filamentType) {
 }
 
 void MMU2::filament_runout() {
+  DEBUG_ECHOLNPGM("runout 1");
   queue.inject(F(MMU2_FILAMENT_RUNOUT_SCRIPT));
+  DEBUG_ECHOLNPGM("runout 2");
   planner.synchronize();
+  DEBUG_ECHOLNPGM("runout 3");
 }
 
 #if HAS_PRUSA_MMU2S
